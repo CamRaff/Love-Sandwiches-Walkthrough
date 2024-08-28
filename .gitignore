@@ -1,0 +1,7 @@
+core.Microsoft*
+core.mongo*
+core.python*
+core.python
+__pycache__/
+*.py[cod]
+creds.json
