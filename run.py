@@ -6,7 +6,10 @@ import gspread
 from google.oauth2.service_account import Credentials
 from pprint import pprint
 
-# Define the scope
+# Every Google account has an IAM (Identity and Access Management)
+# configuration which specifies what the user has access to.
+# Defining the SCOPE lists the APIs a program should have access to in
+# order to run.
 
 SCOPE = [
     "https://www.googleapis.com/auth/spreadsheets",
@@ -161,11 +164,45 @@ def main():
     data = get_sales_data()
     sales_data = [int(num) for num in data]
     update_worksheet(sales_data, 'sales')
+
     new_surplus_data = calculate_surplus_data(sales_data)
     update_worksheet(new_surplus_data, 'surplus')
+
     sales_columns = get_last_5_entries_sales()
     stock_data = calculate_stock_data(sales_columns)
     update_worksheet(stock_data, 'stock')
 
+    return stock_data
+
 print("Welcome to Love Sandwiches Data Automation\n")
-main()
+
+stock_data = main()
+
+def get_stock_values(data):
+    """
+    Print out the calculated stock numbers for each sandwich type.
+    """
+
+    # Acquires the headings from the stock worksheet and stores
+    # them in the headings variable as a list.
+
+    headings = SHEET.worksheet("stock").get_all_values()[0]
+
+    # The below would also work:
+    # headings = SHEET.worksheet('stock').row_values(1)
+
+    print("Make the following numbers of sandwiches for next market:\n")
+    
+    # For loop to iterate through the headings and data lists,
+    # and return the stock values for each sandwich type.
+
+    return {heading: data for heading, data in zip(headings, data)}
+
+    # The below would also work:
+    # new_data = {}
+    # for heading, stock_num in zip(headings, data):
+    #     new_data[heading] = stock_num
+    # return new_data
+    
+stock_values = get_stock_values(stock_data)
+print(stock_values)
